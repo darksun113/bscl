@@ -4,7 +4,6 @@ from pyhunter import PyHunter
 import json
 import csv
 import sys
-import clearbit
 
 #API Key
 hunter = PyHunter('016a2e85a4fd5bc142c055c42cb60954fc1710df')
@@ -12,7 +11,7 @@ hunter = PyHunter('016a2e85a4fd5bc142c055c42cb60954fc1710df')
 
 #option 1:
 try:
-	with open('/Users/kelvin/Desktop/ism2018.csv', 'r', encoding='utf-8') as csvfile:
+	with open('rail-shipper.csv', 'r', encoding='utf-8') as csvfile:
 		csvreader = csv.reader(csvfile)
 		next(csvreader)
 		for row in csvreader:
