@@ -1,3 +1,5 @@
+#given is a csv file with names and companies, output is a list of domain names
+
 from google import google
 import tldextract
 import csv
@@ -5,7 +7,7 @@ import sys
 import time
 
 try:
-	with open('/Users/kelvin/Dropbox/crypto2018uh/ism2018.csv', 'r') as csvfile:
+	with open('/Users/kelvin/Dropbox/crypto2018uh/oil-gas-logistics-small.txt', 'r') as csvfile:
 		csvreader = csv.reader(csvfile)
 		next(csvreader)
 		for row in csvreader:
