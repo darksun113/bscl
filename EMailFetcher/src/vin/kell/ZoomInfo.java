@@ -16,13 +16,24 @@ public class ZoomInfo {
 		Thread.sleep(5000);
 		Document document = Jsoup.connect(c.link).get();
 		Element element = document.selectFirst("div[class=content-box_row website]");
+		Element element_tel = document.selectFirst("div[class=content-box_row phone]");
 		if (element == null)
 			return null;
 		Element a = element.selectFirst("a");
 		if (a == null)
 			return null;
-		else
-			return a.attr("href");
+		else {
+			String returnText = a.attr("href");
+			if(element_tel!=null) {
+				Element span = element_tel.selectFirst("span");
+				if(span!=null) {
+					returnText += "~~~";
+					returnText += span.text();
+				}
+			}
+			return returnText;
+		}
+			
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {
@@ -30,18 +41,19 @@ public class ZoomInfo {
 			System.err.println("Usage: locaion page_number keywords");
 			System.exit(-1);
 		}
-		PrintWriter writer = new PrintWriter("/Users/kelvin/Desktop/out.csv");
-		writer.println("name,position,company,domain");
+		PrintWriter writer = new PrintWriter("out.csv");
+		writer.println("name,position,company,domain,tel");
 		writer.flush();
 		ZoomInfo zi = new ZoomInfo();
 		int page = Integer.parseInt(args[1]);
 		StringBuilder builder = new StringBuilder(BaseUrl);
 		builder.append(args[0]);
-		builder.append("--");
-		for (int i = 2; i < args.length; i++) {
+		builder.append("-");
+		/*for (int i = 2; i < args.length; i++) {
 			builder.append('+');
 			builder.append(args[i]);
-		}
+		}*/
+		builder.append(args[2]);
 
 		String queryUrl = builder.toString();
 		for (int i = 1; i <= page; i++) {
@@ -69,11 +81,14 @@ public class ZoomInfo {
 					founder.company.name = companyEle.text();
 					founder.position = positionEle.text().replace(" "+founder.company.name, "");
 					founder.company.link = "https://www.zoominfo.com" + companyEle.attr("href");
-					String domain = zi.getDomain(founder.company);
+					String ret = zi.getDomain(founder.company);
+					String[] tokens = ret.split("~~~");
+					String domain = tokens[0];
+					if(tokens.length>1)
+						founder.company.tel = tokens[1];
 					founder.company.domain = domain.substring(2, domain.length()).replaceAll(".*\\.(?=.*\\.)", "");
-					;
-					String line = String.format("\"%s\",\"%s\",\"%s\",\"%s\"", founder.name, founder.position,
-							founder.company.name, founder.company.domain);
+					String line = String.format("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"", founder.name, founder.position,
+							founder.company.name, founder.company.domain, founder.company.tel);
 					writer.println(line);
 				}
 			} catch (Exception e) {
